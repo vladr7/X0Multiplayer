@@ -100,6 +100,7 @@ public class GameManager : NetworkBehaviour
         }
         
         playerTypeArray[x, y] = playerType;
+        
 
         Debug.Log("GameManager: " + x + ", " + y);
         OnClickedOnGridPosition?.Invoke(this,
@@ -107,10 +108,58 @@ public class GameManager : NetworkBehaviour
 
         currentPlayablePlayerType.Value =
             currentPlayablePlayerType.Value == PlayerType.Cross ? PlayerType.Circle : PlayerType.Cross;
+        
+        TestTicTacToeWinner();
     }
 
     public PlayerType GetCurrentPlayablePlayerType()
     {
         return currentPlayablePlayerType.Value;
     }
+    
+    private void TestTicTacToeWinner()
+    {
+        // Horizontal
+        for (int y = 0; y < 3; y++)
+        {
+            if (playerTypeArray[0, y] != PlayerType.None &&
+                playerTypeArray[0, y] == playerTypeArray[1, y] &&
+                playerTypeArray[0, y] == playerTypeArray[2, y])
+            {
+                Debug.Log("Winner: " + playerTypeArray[0, y]);
+                currentPlayablePlayerType.Value = PlayerType.None;
+            }
+        }
+        
+        // Vertical
+        for (int x = 0; x < 3; x++)
+        {
+            if (playerTypeArray[x, 0] != PlayerType.None &&
+                playerTypeArray[x, 0] == playerTypeArray[x, 1] &&
+                playerTypeArray[x, 0] == playerTypeArray[x, 2])
+            {
+                Debug.Log("Winner: " + playerTypeArray[x, 0]);
+                currentPlayablePlayerType.Value = PlayerType.None;
+            }
+        }
+        
+        // Diagonal
+        if (playerTypeArray[0, 0] != PlayerType.None &&
+            playerTypeArray[0, 0] == playerTypeArray[1, 1] &&
+            playerTypeArray[0, 0] == playerTypeArray[2, 2])
+        {
+            Debug.Log("Winner: " + playerTypeArray[0, 0]);
+            currentPlayablePlayerType.Value = PlayerType.None;
+        }
+        
+        if (playerTypeArray[2, 0] != PlayerType.None &&
+            playerTypeArray[2, 0] == playerTypeArray[1, 1] &&
+            playerTypeArray[2, 0] == playerTypeArray[0, 2])
+        {
+            Debug.Log("Winner: " + playerTypeArray[2, 0]);
+            currentPlayablePlayerType.Value = PlayerType.None;
+        }
+    }
+    
+    
 }
