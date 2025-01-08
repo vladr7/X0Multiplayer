@@ -3012,6 +3012,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   placeSfxPrefab: {fileID: 2085413283032186904, guid: b8898147229d740d4aa502261be36410, type: 3}
+  winSfxPrefab: {fileID: 2085413283032186904, guid: a747311fa7d7c414ab90dd811d072f9b, type: 3}
+  loseSfxPrefab: {fileID: 2085413283032186904, guid: 19fb46d511bc14bc1b9dad5d93eb3d41, type: 3}
 --- !u!4 &1826270421
 Transform:
   m_ObjectHideFlags: 0
