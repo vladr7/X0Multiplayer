@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,11 +10,34 @@ public class GameVisualManager : NetworkBehaviour
     [SerializeField] private Transform crossPrefab;
     [SerializeField] private Transform circlePrefab;
     [SerializeField] private Transform lineCompletePrefab;
+    
+    private List<GameObject> visualGameObjectList = new List<GameObject>();
+
+    private void Awake()
+    {
+        visualGameObjectList = new List<GameObject>();
+    }
 
     private void Start()
     {
         GameManager.Instance.OnClickedOnGridPosition += OnClickedOnGridPosition;
         GameManager.Instance.OnGameWin += OnGameWin;
+        GameManager.Instance.OnRematch += OnRematch;
+    }
+    
+    private void OnRematch(object sender, EventArgs e)
+    {
+        if(!IsServer)
+        {
+            return;
+        }
+        
+        foreach (GameObject visualGameObject in visualGameObjectList)
+        {
+            Destroy(visualGameObject);
+        }
+        
+        visualGameObjectList.Clear();
     }
 
     private void OnGameWin(object sender, GameManager.OnGameWinEventArgs e)
@@ -44,6 +68,8 @@ public class GameVisualManager : NetworkBehaviour
             GetGridWorldPosition(e.line.centerGridPosition.x, e.line.centerGridPosition.y),
             Quaternion.Euler(0, 0, eulerZ));
         spawnedLineCompleteTransform.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
+        
+        visualGameObjectList.Add(spawnedLineCompleteTransform.gameObject);
     }
 
     private void OnClickedOnGridPosition(object sender, GameManager.ClickedOnGridPositionEventArgs e)
@@ -59,6 +85,8 @@ public class GameVisualManager : NetworkBehaviour
 
         Transform spawnedCrossTransform = Instantiate(prefab, GetGridWorldPosition(x, y), Quaternion.identity);
         spawnedCrossTransform.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
+        
+        visualGameObjectList.Add(spawnedCrossTransform.gameObject);
     }
 
     private Vector2 GetGridWorldPosition(int x, int y)
