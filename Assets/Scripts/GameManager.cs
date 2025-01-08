@@ -22,6 +22,7 @@ public class GameManager : NetworkBehaviour
     public event EventHandler OnRematch;
     public event EventHandler OnGameTied;
     public event EventHandler OnScoreChanged;
+    public event EventHandler OnPlacedObject;
 
     public class OnGameWinEventArgs : EventArgs
     {
@@ -235,8 +236,8 @@ public class GameManager : NetworkBehaviour
         }
 
         playerTypeArray[x, y] = playerType;
-
-
+        TriggerOnPlacedObjectRpc();
+        
         Debug.Log("GameManager: " + x + ", " + y);
         OnClickedOnGridPosition?.Invoke(this,
             new ClickedOnGridPositionEventArgs { x = x, y = y, playerType = playerType });
@@ -245,6 +246,12 @@ public class GameManager : NetworkBehaviour
             currentPlayablePlayerType.Value == PlayerType.Cross ? PlayerType.Circle : PlayerType.Cross;
 
         TestWinner();
+    }
+    
+    [Rpc(SendTo.ClientsAndHost)]
+    private void TriggerOnPlacedObjectRpc()
+    {
+        OnPlacedObject?.Invoke(this, EventArgs.Empty);
     }
     
     [Rpc(SendTo.ClientsAndHost)]
