@@ -23,7 +23,15 @@ public class GameOverUI : MonoBehaviour
     {
         GameManager.Instance.OnGameWin += OnGameWin;
         GameManager.Instance.OnRematch += OnRematch;
+        GameManager.Instance.OnGameTied += OnGameTied;
         Hide();
+    }
+    
+    private void OnGameTied(object sender, EventArgs e)
+    {
+        resultTextMesh.text = "Draw!";
+        resultTextMesh.color = Color.gray;
+        Show();
     }
     
     private void OnRematch(object sender, EventArgs e)
