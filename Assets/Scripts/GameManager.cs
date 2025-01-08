@@ -23,6 +23,7 @@ public class GameManager : NetworkBehaviour
     public class OnGameWinEventArgs : EventArgs
     {
         public Line line;
+        public PlayerType winPlayerType;
     }
 
     public enum PlayerType
@@ -31,7 +32,7 @@ public class GameManager : NetworkBehaviour
         Cross,
         Circle
     }
-    
+
     public enum Orientation
     {
         Horizontal,
@@ -39,7 +40,7 @@ public class GameManager : NetworkBehaviour
         DiagonalA,
         DiagonalB
     }
-    
+
 
     public struct Line
     {
@@ -229,6 +230,17 @@ public class GameManager : NetworkBehaviour
 
         TestWinner();
     }
+    
+    [Rpc(SendTo.ClientsAndHost)]
+    private void TriggerOnGameWinRpc(int lineIndex, PlayerType winPlayerType)
+    {
+        Line line = lineList[lineIndex];
+        OnGameWin?.Invoke(this, new OnGameWinEventArgs
+        {
+            line = line,
+            winPlayerType = winPlayerType
+        });
+    }
 
     public PlayerType GetCurrentPlayablePlayerType()
     {
@@ -241,23 +253,24 @@ public class GameManager : NetworkBehaviour
         (playerTypeArray[line.gridVector2IntList[0].x, line.gridVector2IntList[0].y],
             playerTypeArray[line.gridVector2IntList[1].x, line.gridVector2IntList[1].y],
             playerTypeArray[line.gridVector2IntList[2].x, line.gridVector2IntList[2].y]
-            );
+        );
     }
 
     private bool TestWinnerLine(PlayerType aPlayerType, PlayerType bPlayerType, PlayerType cPlayerType)
     {
         return aPlayerType != PlayerType.None && aPlayerType == bPlayerType && aPlayerType == cPlayerType;
     }
-    
+
     private void TestWinner()
     {
-        foreach (Line line in lineList)
+        for (int i = 0; i < lineList.Count; i++)
         {
+            Line line = lineList[i];
             if (TestWinnerLine(line))
             {
-                Debug.Log("Winner: " + line.centerGridPosition);
+                Debug.Log("Winner: " + i);
                 currentPlayablePlayerType.Value = PlayerType.None;
-                OnGameWin?.Invoke(this, new OnGameWinEventArgs { line = line });
+                TriggerOnGameWinRpc(i, playerTypeArray[line.centerGridPosition.x, line.centerGridPosition.y]);
                 break;
             }
         }
